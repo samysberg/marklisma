@@ -11,6 +11,14 @@ A Markdown Link Structure Maker, for use with Obsidian.md.
 - REMEMBER TO CHANGE THE PATH OF THE VARIABLES "ixTmt" AND "mocTmt" TO SUIT YOUR USE CASE.
 */
 
+// block below: Obsdian's "abstract path" of the index and MOC templater templates:
+var ixTmt = await app.vault.getAbstractFileByPath(
+  "templater/marklisma_indexTemplate.md"
+);
+var mocTmt = await app.vault.getAbstractFileByPath(
+  "templater/marklisma_mocTemplate.md"
+);
+
 // block below: sorted arrays of folder paths (as strings).
 // "sort((b,a)..." is intentional, in order do have the furthest folders parsed before their parents.
 var allDirsArr = this.app.vault
@@ -45,14 +53,6 @@ var mocSrcDirsArr = await DataviewAPI.pages()
       caseFirst: "upper",
     })
   );
-
-// block below: Obsdian's "abstract path" of the index and MOC templater templates:
-var ixTmt = await app.vault.getAbstractFileByPath(
-  "some path/to my/index template.md"
-);
-var mocTmt = await app.vault.getAbstractFileByPath(
-  "some path/to my/MOC template.md"
-);
 
 // block below: initializing some vars.
 var mocTgtDirsArr = [];
@@ -211,16 +211,18 @@ const mkHierStruct = async function () {
   // IF: initial file hierarchy is ok, iterate over index and MOC folder arrays to make/update proper files. 
   if (chkBadSrcHier(ixSrcDirsArr, mocSrcDirsArr)) {
     for (let f of ixSrcDirsArr) {
-      await sleep(200);
+      await sleep(250);
       mkNewIndexFile(f);
-      await sleep(200);
+      await sleep(250);
     }
+    console.log("Marklisma has finished with index files.")
     mkTgtMocDirArr(allDirsArr, ixSrcDirsArr);
     for (let d of mocTgtDirsArr) {
-      await sleep(200);
+      await sleep(250);
       mkNewMocFile(d);
-      await sleep(200);
+      await sleep(250);
     }
+    console.log("Marklisma has finished with MOC files.")
     // ELSE: show hierarchy errors on console.log .
   } else {
     console.log("errors found! \n" + badHierLog.map((p) => p + "\n"));

@@ -1,6 +1,6 @@
 ---
-tags: sometag
-filepath: "<% tp.file.path(true) %>"
+tags: f/index
+filepath: <% '"' + tp.file.path(true) + '"' %>
 ---
 <%* 
 /*
@@ -9,8 +9,19 @@ MARKLISMA - A Markdown Link Structure Maker, for use with Obsidian.md.
 */
 var currDirPath = await tp.file.folder(true)
 
+if (currDirPath == "/") {
+  currDirPath = ""
+}
+
 var getParentDirName = function(n) {
+// IF n is "", this funcion would throw an error (by trying to get root's folder parent).
+// n argument may be "" when this argument is a "p.file.folder" of a root's file
+  if (n === "") {
+// so, in this case the function just returns an empty string.
+  return ""
+  } else {
   return app.vault.getAbstractFileByPath(n).parent.name
+  }
 }
 
 const lineCount = function(txt) {
@@ -22,7 +33,8 @@ const lineCount = function(txt) {
 
 const siblingsFiles = DataviewAPI.markdownTable(["Filename", "Folder", "Path"], (DataviewAPI.pages(`"${currDirPath}"`)
   .where(p => p.file.folder === currDirPath)
-  .where(p => p.file.name !== "index" && p.file.name !== "Untitled")
+  // .where(p => p.file.name !== "index" && p.file.name !== "Untitled") // uncomment this line to test manual file creation from this template
+  .where(p => p.file.name !== "index" )
   .map(p => [p.file.link, getParentDirName(p.file.path), p.file.folder])));
 
 const offspringMdTable = DataviewAPI.markdownTable(["Filename", "Folder", "Path"], (DataviewAPI.pages(`"${currDirPath}"`)
