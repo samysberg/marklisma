@@ -6,7 +6,7 @@ A Markdown Link Structure Maker, to be used with [Obsidian.md](https://obsidian.
 
 Marklisma makes a folder (and it's sub-folders) have a markdown link structure that encompasses every file, while turning the existing folder design in something more meaningful and usable.
 
-While marklisma is currently meant to be used in the Obsidian app (mobile or desktop), it's simple concept could be ported to other markdown editors as well.
+While marklisma is currently meant to be used in the Obsidian app (iOS, Android, Mac, Linux, Windows), it's simple concept could be ported to other markdown editors as well.
 
 ## What does it do?
 
@@ -81,17 +81,17 @@ This screen capture video shows marklisma running: [click here to watch.](media/
 - The folders which holds an "index.md" file, and all of it's children folders, are called "indexed folders"; they won't get MOC files, as the files within them are already linked from the index file.
 - Note that note creation from within the Obsidian app will prompt for the note name, and the ".md" extension will be automatically appended to it.
 
-1) Where to create the MOC files.
+2) Where to create the MOC files.
 - Marklisma will create MOC files in every folder that is not indexed.
 
-2) Content of index and MOC files.
+3) Content of index and MOC files.
 
 - Index files template is: `src/marklisma_indexTemplate.md` .
 - MOC files template is: `src/marklisma_mocTemplate.md` .
 - Changes in any of them should be taken into effect next time marklisma is run. 
 - Before running marklisma, you can test those templates by inserting them or creating a new file with them, the same way any templater template would be tested.
 
-3) Script Logic.
+4) Script Logic.
 
 - Most of marklisma logic is at it's main file `src/marklisma_main.md`, which outputs no content to the index or MOC files.
 
@@ -101,6 +101,18 @@ Marklisma tests for two error checks, that if found will prevent marklisma from 
 
 - Are there index files inside an indexed folder? (That is, are there nested indexed folders?)
 - Are there MOC files inside an indexed folder?
+
+## What about the YAML FM (frontmatter)?
+
+- If a MOC or index file already has a YAML FM marklisma will try to preserve most of it at the succeeding (updated) file.
+	- Many common FM key/values, like tags, aliases and others should be preserved.
+- Some keys and values may get removed. 
+	- Any FM key that starts with "date" will NOT be preserved at the updated index/MOC file.
+	- This is meant to avoid keeping wrong data in some use cases. For example, if you use the linter plugin and it adds to an index/MOC FM some keys like "date created" and "date updated", both would be potentially inaccurate, as they would reflect the filesystem metadata about it; however, marklisma's (index/MOC) file update doesn't just change file's contents, but actually deletes pre-existing file and creates a new one. This happens each time marklisma runs, for every index/MOC file (even when the updated file has the same content as the pre-existing one).
+	- For those who want to keep index/MOC FM with creation date, I suggest naming this key differently, maybe like "real date created", or "creation date".
+- Some keys and values will be added.
+	- A `"date updated"` key, with a corresponding value, will be added. You may want to customize Time/Date formatting (this can be edited in `src/marklisma_main.md`). This key/value will designedly be updated at each marklisma run.
+	- A `"disabled rules: all"` key/value will be added. This is meant to avoid Linter plugin from linting index/MOC files.
 
 ## How to test marklisma?
 
@@ -131,9 +143,24 @@ More about markdown:
 
 
 # TODO
-- Fix the promise-related error on file creation/update with something better than the timeouts in the main file. (Note: Most of times this error happens, the resulting files are ok.)
-- Pull requests and issues are welcome.
+- Pull requests and issues are very welcome.
+- Fix some occasionally flagged (on console.log) errors:
+	- A promise-related error on some file creation/update.
+	- Another error related to absence of obsidian metadata error on some files (mostly when the file was created from outside of obsidian app).
+	- Note: most of time those errors happened to me, the I got the index/MOC files as intended.
+- Fix the need for the timeouts in the main marklisma file.
+	- Without them, the dataview query from a file could get into another file. I tried to fix it by using async/await for the queries, but this was throwing an error; maybe later I will try this again.
 - Ask/wait for templater's API.
 
 # Roadmap
-- Maybe consider branching marklisma to a standalone Obsidian plugin (which would mean not relying on Templater, but only on Dataview) (this could also make development testing much easier).
+- Maybe consider branching marklisma to a standalone Obsidian plugin (which would mean not relying on Templater, but only on Dataview). This could also make development testing much easier.
+
+# Acknowledgments
+- Obsidian founders and Obsidian development team, for this amazing piece of software.
+- Obsidian community, for so many enthusiastic contributions.
+- The writers of those great pages/websites I used while developing marklisma:
+	- https://liamca.in/hello
+	- https://marcus.se.net/obsidian-plugin-docs/ (note: a few days ago the official obsidian plugin docs was published as well.)
+	- https://shbgm.ca/blog/obsidian/how-to-use-templater-js-scripts
+	- Dataview plugin: https://blacksmithgu.github.io/obsidian-dataview/)
+	- Templater plugin: https://silentvoid13.github.io/Templater/
